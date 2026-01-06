@@ -5,6 +5,60 @@ require_once __DIR__ . '/../../config/database.php';
 
 // Hanya admin yang bisa akses
 requireAdmin();
+// handle POST actions (update status, approve/reject, delete)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if (!empty($_POST['action'])) {
+    try {
+      if ($_POST['action'] === 'update_item_status' && !empty($_POST['item_id']) && !empty($_POST['status'])) {
+        $stmt = $pdo->prepare('UPDATE items SET status = ?, updated_at = NOW() WHERE id = ?');
+        $stmt->execute([$_POST['status'], $_POST['item_id']]);
+      }
+      if ($_POST['action'] === 'delete_item' && !empty($_POST['item_id'])) {
+        $stmt = $pdo->prepare('DELETE FROM items WHERE id = ?');
+        $stmt->execute([$_POST['item_id']]);
+      }
+      if ($_POST['action'] === 'approve_claim' && !empty($_POST['claim_id'])) {
+        $stmt = $pdo->prepare('UPDATE claims SET status = "approved", reviewed_at = NOW() WHERE id = ?');
+        $stmt->execute([$_POST['claim_id']]);
+      }
+      if ($_POST['action'] === 'reject_claim' && !empty($_POST['claim_id'])) {
+        $stmt = $pdo->prepare('UPDATE claims SET status = "rejected", reviewed_at = NOW() WHERE id = ?');
+        $stmt->execute([$_POST['claim_id']]);
+      }
+    } catch (PDOException $e) {
+      // You may log error in production
+    }
+  }
+  header('Location: ' . $_SERVER['REQUEST_URI']);
+  exit();
+}
+
+// fetch dashboard data
+try {
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM items WHERE type = 'lost'");
+  $stmt->execute();
+  $lost_count = $stmt->fetchColumn();
+
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM items WHERE type = 'found'");
+  $stmt->execute();
+  $found_count = $stmt->fetchColumn();
+
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM claims WHERE status = 'pending'");
+  $stmt->execute();
+  $claims_pending = $stmt->fetchColumn();
+
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM items WHERE status = 'matched'");
+  $stmt->execute();
+  $matches_count = $stmt->fetchColumn();
+
+  $items = $pdo->query('SELECT * FROM items ORDER BY created_at DESC LIMIT 100')->fetchAll();
+  $claims = $pdo->query('SELECT c.*, i.title AS item_title FROM claims c JOIN items i ON c.item_id = i.id ORDER BY c.created_at DESC LIMIT 100')->fetchAll();
+} catch (PDOException $e) {
+  $lost_count = $found_count = $claims_pending = $matches_count = 0;
+  $items = [];
+  $claims = [];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +66,7 @@ requireAdmin();
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Stellar Admin</title>
+    <title>Lost & Found - Admin Dashboard</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="assets/vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="assets/vendors/flag-icon-css/css/flag-icons.min.css">
@@ -65,7 +119,7 @@ requireAdmin();
           </button>
         </div>
         <div class="navbar-menu-wrapper d-flex align-items-center">
-          <h5 class="mb-0 font-weight-medium d-none d-lg-flex">Welcome stellar dashboard!</h5>
+          <h5 class="mb-0 font-weight-medium d-none d-lg-flex">Welcome to Lost & Found Admin</h5>
           <ul class="navbar-nav navbar-nav-right">
             <form class="search-form d-none d-md-block" action="#">
               <i class="icon-magnifier"></i>
@@ -156,119 +210,65 @@ requireAdmin();
       <!-- partial -->
       <div class="container-fluid page-body-wrapper">
         <!-- partial:partials/_sidebar.html -->
-        <nav class="sidebar sidebar-offcanvas" id="sidebar">
-          <ul class="nav">
-            <li class="nav-item navbar-brand-mini-wrapper">
-              <a class="nav-link navbar-brand brand-logo-mini" href="index.html"><img src="assets/images/logo-mini.svg" alt="logo" /></a>
-            </li>
-            <li class="nav-item nav-profile">
-              <a href="#" class="nav-link">
-                <div class="profile-image">
-                  <img class="img-xs rounded-circle" src="assets/images/faces/face8.jpg" alt="profile image">
-                  <div class="dot-indicator bg-success"></div>
-                </div>
-                <div class="text-wrapper">
-                  <p class="profile-name">Henry Klein</p>
-                  <p class="designation">Administrator</p>
-                </div>
-                <div class="icon-container">
-                  <i class="icon-bubbles"></i>
-                  <div class="dot-indicator bg-danger"></div>
-                </div>
-              </a>
-            </li>
-            <li class="nav-item nav-category">
-              <span class="nav-link">Dashboard</span>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="index.html">
-                <span class="menu-title">Dashboard</span>
-                <i class="icon-screen-desktop menu-icon"></i>
-              </a>
-            </li>
-            <li class="nav-item nav-category"><span class="nav-link">UI Elements</span></li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-                <span class="menu-title">Basic UI Elements</span>
-                <i class="icon-layers menu-icon"></i>
-              </a>
-              <div class="collapse" id="ui-basic">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="pages/ui-features/buttons.html">Buttons</a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/ui-features/dropdowns.html">Dropdowns</a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/ui-features/typography.html">Typography</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
-                <span class="menu-title">Icons</span>
-                <i class="icon-globe menu-icon"></i>
-              </a>
-              <div class="collapse" id="icons">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="pages/icons/font-awesome.html">Font Awesome</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#forms" aria-expanded="false" aria-controls="forms">
-                <span class="menu-title">Forms</span>
-                <i class="icon-book-open menu-icon"></i>
-              </a>
-              <div class="collapse" id="forms">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="pages/forms/basic_elements.html">Form Elements</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
-                <span class="menu-title">Charts</span>
-                <i class="icon-chart menu-icon"></i>
-              </a>
-              <div class="collapse" id="charts">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="pages/charts/chartjs.html">ChartJs</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
-                <span class="menu-title">Tables</span>
-                <i class="icon-grid menu-icon"></i>
-              </a>
-              <div class="collapse" id="tables">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="pages/tables/basic-table.html">Basic Table</a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item nav-category"><span class="nav-link">Extra Pages</span></li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-                <span class="menu-title">User Pages</span>
-                <i class="icon-disc menu-icon"></i>
-              </a>
-              <div class="collapse" id="auth">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/blank-page.html"> Blank Page </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html"> 404 </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> 500 </a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item nav-category"><span class="nav-link">Help</span></li>
-            <li class="nav-item">
-              <a class="nav-link" href="../../docs/documentation.html" target="_blank">
-                <span class="menu-title">Documentation</span>
-                <i class="icon-folder-alt menu-icon"></i>
-              </a>
-            </li>
-          </ul>
-        </nav>
+        <!-- partial:partials/_sidebar.html -->
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <li class="nav-item navbar-brand-mini-wrapper">
+      <a class="nav-link navbar-brand brand-logo-mini" href="index.php">
+        <img src="assets/images/logo-mini.svg" alt="logo" />
+      </a>
+    </li>
+    <li class="nav-item nav-profile">
+      <a href="#" class="nav-link">
+        <div class="profile-image">
+          <img class="img-xs rounded-circle" src="assets/images/faces/face8.jpg" alt="profile image">
+          <div class="dot-indicator bg-success"></div>
+        </div>
+        <div class="text-wrapper">
+          <p class="profile-name">Administrator</p>
+          <p class="designation">Admin Panel</p>
+        </div>
+      </a>
+    </li>
+    
+    <!-- DASHBOARD -->
+    <li class="nav-item nav-category">
+      <span class="nav-link">Navigation</span>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="index.php">
+        <span class="menu-title">Dashboard</span>
+        <i class="icon-screen-desktop menu-icon"></i>
+      </a>
+    </li>
+    
+    <!-- ITEMS MANAGEMENT -->
+    <li class="nav-item nav-category">
+      <span class="nav-link">Items Management</span>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="items.php">
+        <span class="menu-title">Items</span>
+        <i class="icon-bag menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="claims.php">
+        <span class="menu-title">claims</span>
+        <i class="icon-briefcase menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="admins.php">
+        <span class="menu-title">Admins</span>
+        <i class="icon-plus menu-icon"></i>
+      </a>
+    </li>
+    
+    
+  </ul>
+</nav>
+<!-- partial -->
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
@@ -337,31 +337,7 @@ requireAdmin();
                 </div>
               </div>
             </div>
-            <!-- Quick Action Toolbar Starts-->
-            <div class="row quick-action-toolbar">
-              <div class="col-md-12 grid-margin">
-                <div class="card">
-                  <div class="card-header d-block d-md-flex">
-                    <h5 class="mb-0">Quick Actions</h5>
-                    <p class="ms-auto mb-0">How are your active users trending overtime?<i class="icon-bulb"></i></p>
-                  </div>
-                  <div class="d-md-flex row m-0 quick-action-btns" role="group" aria-label="Quick action buttons">
-                    <div class="col-sm-6 col-md-3 p-3 text-center btn-wrapper">
-                      <button type="button" class="btn px-0"> <i class="icon-user me-2"></i> Add Client</button>
-                    </div>
-                    <div class="col-sm-6 col-md-3 p-3 text-center btn-wrapper">
-                      <button type="button" class="btn px-0"><i class="icon-docs me-2"></i> Create Quote</button>
-                    </div>
-                    <div class="col-sm-6 col-md-3 p-3 text-center btn-wrapper">
-                      <button type="button" class="btn px-0"><i class="icon-folder me-2"></i> Enter Payment</button>
-                    </div>
-                    <div class="col-sm-6 col-md-3 p-3 text-center btn-wrapper">
-                      <button type="button" class="btn px-0"><i class="icon-book-open me-2"></i>Create Invoice</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
             <!-- Quick Action Toolbar Ends-->
             <div class="row">
               <div class="col-md-12 grid-margin">
@@ -377,9 +353,9 @@ requireAdmin();
                     <div class="row report-inner-cards-wrapper">
                       <div class=" col-md -6 col-xl report-inner-card">
                         <div class="inner-card-text">
-                          <span class="report-title">EXPENSE</span>
-                          <h4>$32123</h4>
-                          <span class="report-count"> 2 Reports</span>
+                          <span class="report-title">LOST ITEMS</span>
+                          <h4><?= (int)($lost_count ?? 0) ?></h4>
+                          <span class="report-count"> recent</span>
                         </div>
                         <div class="inner-card-icon bg-success">
                           <i class="icon-rocket"></i>
@@ -387,9 +363,9 @@ requireAdmin();
                       </div>
                       <div class="col-md-6 col-xl report-inner-card">
                         <div class="inner-card-text">
-                          <span class="report-title">PURCHASE</span>
-                          <h4>95,458</h4>
-                          <span class="report-count"> 3 Reports</span>
+                          <span class="report-title">FOUND ITEMS</span>
+                          <h4><?= (int)($found_count ?? 0) ?></h4>
+                          <span class="report-count"> recent</span>
                         </div>
                         <div class="inner-card-icon bg-danger">
                           <i class="icon-briefcase"></i>
@@ -397,9 +373,9 @@ requireAdmin();
                       </div>
                       <div class="col-md-6 col-xl report-inner-card">
                         <div class="inner-card-text">
-                          <span class="report-title">QUANTITY</span>
-                          <h4>2650</h4>
-                          <span class="report-count"> 5 Reports</span>
+                          <span class="report-title">CLAIMS PENDING</span>
+                          <h4><?= (int)($claims_pending ?? 0) ?></h4>
+                          <span class="report-count"> awaiting review</span>
                         </div>
                         <div class="inner-card-icon bg-warning">
                           <i class="icon-globe-alt"></i>
@@ -407,9 +383,9 @@ requireAdmin();
                       </div>
                       <div class="col-md-6 col-xl report-inner-card">
                         <div class="inner-card-text">
-                          <span class="report-title">RETURN</span>
-                          <h4>25,542</h4>
-                          <span class="report-count"> 9 Reports</span>
+                          <span class="report-title">MATCHES</span>
+                          <h4><?= (int)($matches_count ?? 0) ?></h4>
+                          <span class="report-count"> confirmed</span>
                         </div>
                         <div class="inner-card-icon bg-primary">
                           <i class="icon-diamond"></i>
@@ -425,97 +401,127 @@ requireAdmin();
                 <div class="card">
                   <div class="card-body">
                     <div class="d-sm-flex align-items-center mb-4">
-                      <h4 class="card-title mb-sm-0">Products Inventory</h4>
-                      <a href="#" class="text-dark ms-auto mb-3 mb-sm-0"> View all Products</a>
+                      <h4 class="card-title mb-sm-0">Reported Items</h4>
+                      <a href="#" class="text-dark ms-auto mb-3 mb-sm-0"> View all Reports</a>
                     </div>
                     <div class="table-responsive border rounded p-1">
                       <table class="table">
                         <thead>
                           <tr>
-                            <th class="font-weight-bold">Store ID</th>
-                            <th class="font-weight-bold">Amount</th>
-                            <th class="font-weight-bold">Gateway</th>
-                            <th class="font-weight-bold">Created at</th>
-                            <th class="font-weight-bold">Paid at</th>
+                            <th class="font-weight-bold">Reporter</th>
+                            <th class="font-weight-bold">Item</th>
+                            <th class="font-weight-bold">Location</th>
+                            <th class="font-weight-bold">Reported at</th>
+                            <th class="font-weight-bold">Event date</th>
                             <th class="font-weight-bold">Status</th>
+                            <th class="font-weight-bold">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
+                          <?php foreach ($items as $it): ?>
                           <tr>
+                            <td><?= htmlspecialchars($it['user_name'] ?: '—') ?></td>
+                            <td><?= htmlspecialchars($it['title']) ?> </small></td>
+                            <td><?= htmlspecialchars($it['location']) ?></td>
+                            <td><?= htmlspecialchars($it['created_at']) ?></td>
+                            <td><?= htmlspecialchars($it['date_reported']) ?></td>
                             <td>
-                              <img class="img-sm rounded-circle" src="assets/images/faces/face1.jpg" alt="profile image"> Katie Holmes
+                              <div class="badge badge-<?= $it['status'] === 'open' ? 'danger' : ($it['status'] === 'matched' ? 'success' : 'info') ?> p-2"><?= htmlspecialchars($it['status']) ?></div>
                             </td>
-                            <td>$3621</td>
-                            <td><img src="assets/images/dashboard/alipay.png" alt="alipay" class="gateway-icon me-2"> alipay</td>
-                            <td>04 Jun 2019</td>
-                            <td>18 Jul 2019</td>
                             <td>
-                              <div class="badge badge-success p-2">Paid</div>
+                              <form method="post" style="display:inline-block; margin-right:6px;">
+                                <input type="hidden" name="action" value="update_item_status">
+                                <input type="hidden" name="item_id" value="<?= (int)$it['id'] ?>">
+                                <select name="status" class="form-select form-select-sm" style="display:inline-block; width:auto;">
+                                  <option value="open" <?= $it['status'] === 'open' ? 'selected' : '' ?>>open</option>
+                                  <option value="matched" <?= $it['status'] === 'matched' ? 'selected' : '' ?>>matched</option>
+                                  <option value="returned" <?= $it['status'] === 'returned' ? 'selected' : '' ?>>returned</option>
+                                </select>
+                                <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                              </form>
+                              <form method="post" style="display:inline-block;" onsubmit="return confirm('Hapus item ini?');">
+                                <input type="hidden" name="action" value="delete_item">
+                                <input type="hidden" name="item_id" value="<?= (int)$it['id'] ?>">
+                                <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                              </form>
                             </td>
                           </tr>
-                          <tr>
-                            <td>
-                              <img class="img-sm rounded-circle" src="assets/images/faces/face2.jpg" alt="profile image"> Minnie Copeland
-                            </td>
-                            <td>$6245</td>
-                            <td><img src="assets/images/dashboard/paypal.png" alt="alipay" class="gateway-icon me-2"> Paypal</td>
-                            <td>25 Sep 2019</td>
-                            <td>07 Oct 2019</td>
-                            <td>
-                              <div class="badge badge-danger p-2">Pending</div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <img class="img-sm rounded-circle" src="assets/images/faces/face3.jpg" alt="profile image"> Rodney Sims
-                            </td>
-                            <td>$9265</td>
-                            <td><img src="assets/images/dashboard/alipay.png" alt="alipay" class="gateway-icon me-2"> alipay</td>
-                            <td>12 dec 2019</td>
-                            <td>26 Aug 2019</td>
-                            <td>
-                              <div class="badge badge-warning p-2">Failed</div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <img class="img-sm rounded-circle" src="assets/images/faces/face4.jpg" alt="profile image"> Carolyn Barker
-                            </td>
-                            <td>$2263</td>
-                            <td><img src="assets/images/dashboard/alipay.png" alt="alipay" class="gateway-icon me-2"> alipay</td>
-                            <td>30 Sep 2019</td>
-                            <td>20 Oct 2019</td>
-                            <td>
-                              <div class="badge badge-success p-2">Paid</div>
-                            </td>
-                          </tr>
+                          <?php endforeach; ?>
                         </tbody>
                       </table>
                     </div>
                     <div class="d-flex mt-4 flex-wrap align-items-center">
-                      <p class="text-muted mb-sm-0">Showing 1 to 10 of 57 entries</p>
-                      <nav class="ms-auto">
-                        <ul class="pagination separated pagination-info mb-sm-0">
-                          <li class="page-item"><a href="#" class="page-link"><i class="icon-arrow-left"></i></a></li>
-                          <li class="page-item active"><a href="#" class="page-link">1</a></li>
-                          <li class="page-item"><a href="#" class="page-link">2</a></li>
-                          <li class="page-item"><a href="#" class="page-link">3</a></li>
-                          <li class="page-item"><a href="#" class="page-link">4</a></li>
-                          <li class="page-item"><a href="#" class="page-link"><i class="icon-arrow-right"></i></a></li>
-                        </ul>
-                      </nav>
+                      <p class="text-muted mb-sm-0">Showing <?= count($items) ?> entries</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            
+
+            <div class="row">
+              <div class="col-md-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-sm-flex align-items-center mb-4">
+                      <h4 class="card-title mb-sm-0">Claims</h4>
+                      <a href="#" class="text-dark ms-auto mb-3 mb-sm-0"> View all Claims</a>
+                    </div>
+                    <div class="table-responsive border rounded p-1">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Claim ID</th>
+                            <th>Item</th>
+                            <th>Claimer</th>
+                            <th>Contact</th>
+                            <th>Proof</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php foreach ($claims as $c): ?>
+                          <tr>
+                            <td><?= (int)$c['id'] ?></td>
+                            <td><?= htmlspecialchars($c['item_title']) ?></td>
+                            <td><?= htmlspecialchars($c['claimer_name']) ?></td>
+                            <td><?= htmlspecialchars($c['claimer_contact']) ?></td>
+                            <td><?= nl2br(htmlspecialchars($c['proof_text'])) ?></td>
+                            <td><?= htmlspecialchars($c['created_at'] ?? '') ?></td>
+                            <td><div class="badge badge-<?= $c['status']==='pending' ? 'warning' : ($c['status']==='approved' ? 'success' : 'danger') ?> p-2"><?= htmlspecialchars($c['status']) ?></div></td>
+                            <td>
+                              <?php if ($c['status'] === 'pending'): ?>
+                                <form method="post" style="display:inline-block; margin-right:6px;">
+                                  <input type="hidden" name="action" value="approve_claim">
+                                  <input type="hidden" name="claim_id" value="<?= (int)$c['id'] ?>">
+                                  <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                                </form>
+                                <form method="post" style="display:inline-block;">
+                                  <input type="hidden" name="action" value="reject_claim">
+                                  <input type="hidden" name="claim_id" value="<?= (int)$c['id'] ?>">
+                                  <button class="btn btn-sm btn-danger" type="submit">Reject</button>
+                                </form>
+                              <?php else: ?>
+                                —
+                              <?php endif; ?>
+                            </td>
+                          </tr>
+                          <?php endforeach; ?>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
           <!-- content-wrapper ends -->
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024 Stellar. All rights reserved. <a href="#"> Terms of use</a><a href="#">Privacy Policy</a></span>
+              <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2026 Lost & Found. All rights reserved. <a href="#"> Terms of use</a><a href="#">Privacy Policy</a></span>
               <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="icon-heart text-danger"></i></span>
             </div>
           </footer>

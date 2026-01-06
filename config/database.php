@@ -3,7 +3,7 @@
 require_once __DIR__ . '/config.php'; // Menggunakan config.php yang ada di folder yang sama
 
 $host = $config['db']['host'] ?? 'localhost';
-$dbname = $config['db']['name'] ?? 'lostfound';
+$dbname = $config['db']['name'] ?? 'db_lostfound';
 $username = $config['db']['user'] ?? 'root';
 $password = $config['db']['pass'] ?? '';
 $charset = $config['db']['charset'] ?? 'utf8mb4';

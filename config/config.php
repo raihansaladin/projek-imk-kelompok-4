@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
   'db' => [
     'host' => 'localhost',
-    'name' => 'lostfound',
+    'name' => 'db_lostfound',
     'user' => 'root',
     'pass' => '',
     'charset' => 'utf8mb4',
