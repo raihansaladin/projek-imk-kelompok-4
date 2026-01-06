@@ -9,11 +9,13 @@ $errors = [];
 // Ambil semua barang yang ditemukan (type = 'found' dan status = 'open')
 try {
     $stmt = $pdo->query("
-        SELECT id, title, description, location, date_reported, created_at 
-        FROM items 
-        WHERE type = 'found' AND status = 'open'
-        ORDER BY created_at DESC
-    ");
+    SELECT id, title, description, location, date_reported, created_at 
+    FROM items 
+    WHERE status = 'open'
+      AND type IN ('found', 'lost')
+    ORDER BY created_at DESC
+");
+
     $items = $stmt->fetchAll();
 } catch (PDOException $e) {
     $errors[] = "Gagal mengambil data barang: " . $e->getMessage();

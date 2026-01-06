@@ -491,7 +491,7 @@ try {
               <li><a href="forms/reports-lost.php">Lapor Barang Hilang</a></li>
               <li><a href="forms/report-found.html">Lapor Barang Ditemukan</a></li>
               <li><a href="items/all-items.php">Cari Barang</a></li>
-              <li><a href="contact.php">Klaim Barang</a></li>
+              <li><a href="forms/claim-item.php">Klaim Barang</a></li>
             </ul>
           </div>
         </div>
@@ -499,7 +499,7 @@ try {
         <div class="col-lg-3 col-md-6">
           <div class="footer-contact">
             <h5>Kontak</h5>
-            <p><i class="bi bi-geo-alt"></i> Gedung Rektorat, Kampus Universitas</p>
+            <p><i class="bi bi-geo-alt"></i> Universitas Halu Oleo</p>
             <p><i class="bi bi-envelope"></i> help@lostfound.ac.id</p>
             <p><i class="bi bi-phone"></i> (021) 1234-5678</p>
           </div>
