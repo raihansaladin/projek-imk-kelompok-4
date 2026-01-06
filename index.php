@@ -200,7 +200,7 @@ try {
     <div class="row align-items-center">
       <div class="col-lg-8 mx-auto text-center">
         <h1 class="display-4 fw-bold mb-4">Temukan Barang Hilang dengan Mudah</h1>
-        <p class="lead mb-5">Platform terpercaya untuk melaporkan dan menemukan barang hilang di lingkungan kampus. Bergabung dengan ribuan pengguna yang telah berhasil menemukan barang mereka.</p>
+        <p class="lead mb-5">Platform terpercaya untuk melaporkan dan menemukan barang hilang di lingkungan kampus.</p>
         
           <a href="#items" class="btn btn-hero-secondary btn-lg">
             <i class="bi bi-search"></i> Cari Barang
