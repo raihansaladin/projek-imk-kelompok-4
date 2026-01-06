@@ -140,8 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="../index.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="../index.php#items">Barang</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="reports-lost.php">Lapor Hilang</a></li>
-                    <li class="nav-item"><a class="nav-link" href="reports-found.php">Lapor Ditemukan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="reports-lost.php">Lapor Hilang</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="reports-found.php">Lapor Ditemukan</a></li>
                 </ul>
             </div>
         </div>
@@ -150,15 +150,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Main Form -->
     <div class="form-container">
         <div class="form-header">
-            <span class="badge"><i class="bi bi-exclamation-triangle"></i> LAPOR BARANG HILANG</span>
-            <h1>Laporkan Barang Hilang Anda</h1>
-            <p class="text-muted">Isi form berikut dengan detail barang yang hilang. Data Anda akan aman dan hanya digunakan untuk proses pencarian.</p>
+            <span class="badge"><i class="bi bi-exclamation-triangle"></i> LAPOR BARANG DITEMUKAN</span>
+            <h1>Laporkan Barang yang Anda Temukan</h1>
+            <p class="text-muted">Isi form berikut dengan detail barang yang ditemukan. Data Anda akan aman dan hanya digunakan untuk proses pencarian.</p>
         </div>
 
         <!-- Success Message -->
         <?php if ($success): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill"></i> <strong>Berhasil!</strong> Laporan barang hilang telah disimpan. Kami akan membantu mencari barang Anda.
+                <i class="bi bi-check-circle-fill"></i> <strong>Berhasil!</strong> Laporan barang ditemukan telah disimpan. Kami akan membantu mencari barang Anda.
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 <div class="mt-3">
                     <a href="../index.php" class="btn btn-success btn-sm">

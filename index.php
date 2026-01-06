@@ -188,11 +188,7 @@ try {
                 </a>
             </li>
         <?php endif; ?>
-        <li class="nav-item">
-          <a class="btn btn-report" href="forms/report-lost.php">
-            <i class="bi bi-plus-circle"></i> Lapor Barang
-          </a>
-        </li>
+        
       </ul>
     </div>
   </div>
