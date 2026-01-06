@@ -205,10 +205,7 @@ try {
       <div class="col-lg-8 mx-auto text-center">
         <h1 class="display-4 fw-bold mb-4">Temukan Barang Hilang dengan Mudah</h1>
         <p class="lead mb-5">Platform terpercaya untuk melaporkan dan menemukan barang hilang di lingkungan kampus. Bergabung dengan ribuan pengguna yang telah berhasil menemukan barang mereka.</p>
-        <div class="hero-buttons">
-          <a href="forms/reports-lost.php" class="btn btn-hero-primary btn-lg">
-            <i class="bi bi-plus-circle"></i> Lapor Barang Hilang
-          </a>
+        
           <a href="#items" class="btn btn-hero-secondary btn-lg">
             <i class="bi bi-search"></i> Cari Barang
           </a>
@@ -547,7 +544,7 @@ try {
         </ul>
       </div>
       <div class="modal-footer">
-        <a href="forms/report-lost.php" class="btn btn-primary">Lapor Sekarang</a>
+        <a href="forms/reports-lost.php" class="btn btn-primary">Lapor Sekarang</a>
       </div>
     </div>
   </div>
