@@ -163,6 +163,31 @@ try {
         <li class="nav-item"><a class="nav-link" href="#stats">Statistik</a></li>
         <li class="nav-item"><a class="nav-link" href="#items">Barang</a></li>
         <li class="nav-item"><a class="nav-link" href="#process">Cara Kerja</a></li>
+
+        <?php if (isset($_SESSION['user_id'])): ?>
+         <!-- Jika sudah login -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle"></i> <?php echo $_SESSION['username']; ?>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="dashboard/dashboard.php">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="logout.php">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a></li>
+            </ul>
+        </li>
+        <?php else: ?>
+            <!-- Jika belum login -->
+            <li class="nav-item">
+                <a class="nav-link" href="login.php">
+                    <i class="bi bi-box-arrow-in-right"></i> Login Admin
+                </a>
+            </li>
+        <?php endif; ?>
         <li class="nav-item">
           <a class="btn btn-report" href="forms/report-lost.php">
             <i class="bi bi-plus-circle"></i> Lapor Barang
@@ -289,7 +314,7 @@ try {
           <div class="stat-icon">
             <i class="bi bi-people"></i>
           </div>
-          <h3 class="stat-number" data-count="<?php echo $users_count; ?>">0</h3>
+          <h3 class="stat-number" data-count="1274">0</h3>
           <p class="stat-label">Pengguna Aktif</p>
         </div>
       </div>
