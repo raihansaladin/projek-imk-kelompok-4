@@ -156,7 +156,7 @@ small {
         <div class="collapse navbar-collapse" id="navmenu">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="../index.php">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="reports-lost.php">Barang Hilang</a></li>
+                <li class="nav-item"><a class="nav-link" href="all-items.php">Barang Hilang</a></li>
                 <li class="nav-item"><a class="nav-link active" href="barangditemukan.php">Barang Ditemukan</a></li>
             </ul>
         </div>
