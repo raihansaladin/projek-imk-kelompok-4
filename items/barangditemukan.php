@@ -7,11 +7,10 @@ if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
 
-/* =======================
-   FILTER BARANG HILANG
-   TANPA UBAH STRUKTUR
-   ======================= */
-$query = "SELECT * FROM items WHERE type = 'lost' ORDER BY created_at DESC";
+/* =========================
+   FILTER BARANG DITEMUKAN
+   ========================= */
+$query = "SELECT * FROM items WHERE type = 'found' ORDER BY created_at DESC";
 
 $result = mysqli_query($conn, $query);
 if (!$result) {
@@ -157,8 +156,8 @@ small {
         <div class="collapse navbar-collapse" id="navmenu">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="../index.php">Home</a></li>
-                <li class="nav-item"><a class="nav-link active" href="reports-lost.php">Barang Hilang</a></li>
-                <li class="nav-item"><a class="nav-link" href="barangditemukan.php">Barang Ditemukan</a></li>
+                <li class="nav-item"><a class="nav-link" href="reports-lost.php">Barang Hilang</a></li>
+                <li class="nav-item"><a class="nav-link active" href="barangditemukan.php">Barang Ditemukan</a></li>
             </ul>
         </div>
     </div>
@@ -166,7 +165,7 @@ small {
 
 <!-- ITEMS -->
 <section id="items" class="section-items">
-<h2> Barang Hilang</h2>
+<h2> Barang Ditemukan</h2>
 
 <div class="items-grid">
 <?php while ($row = mysqli_fetch_assoc($result)) : ?>
