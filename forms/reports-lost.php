@@ -1,5 +1,5 @@
 <?php
-// forms/report-lost.php
+// forms/reports-lost.php
 require_once __DIR__ . '/../config/database.php';
 
 $success = false;
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="../index.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="../index.php#items">Barang</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="report-lost.php">Lapor Hilang</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="reports-lost.php">Lapor Hilang</a></li>
                     <li class="nav-item"><a class="nav-link" href="report-found.php">Lapor Ditemukan</a></li>
                 </ul>
             </div>
@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="../index.php" class="btn btn-success btn-sm">
                         <i class="bi bi-house"></i> Kembali ke Home
                     </a>
-                    <a href="report-lost.php" class="btn btn-outline-success btn-sm">
+                    <a href="reports-lost.php" class="btn btn-outline-success btn-sm">
                         <i class="bi bi-plus-circle"></i> Lapor Lagi
                     </a>
                 </div>

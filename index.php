@@ -189,7 +189,7 @@ try {
             </li>
         <?php endif; ?>
         <li class="nav-item">
-          <a class="btn btn-report" href="forms/report-lost.php">
+          <a class="btn btn-report" href="forms/reports-lost.php">
             <i class="bi bi-plus-circle"></i> Lapor Barang
           </a>
         </li>
@@ -492,7 +492,7 @@ try {
           <div class="footer-links">
             <h5>Layanan</h5>
             <ul>
-              <li><a href="forms/report-lost.php">Lapor Barang Hilang</a></li>
+              <li><a href="forms/reports-lost.php">Lapor Barang Hilang</a></li>
               <li><a href="forms/report-found.html">Lapor Barang Ditemukan</a></li>
               <li><a href="items/all-items.php">Cari Barang</a></li>
               <li><a href="contact.php">Klaim Barang</a></li>

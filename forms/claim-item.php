@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <!-- Navbar sama seperti di report-lost.php -->
+    <!-- Navbar sama seperti di reports-lost.php -->
 
     <div class="container container-custom">
         <div class="section-header">
