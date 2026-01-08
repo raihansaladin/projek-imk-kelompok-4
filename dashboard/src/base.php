@@ -146,6 +146,12 @@ function getBaseTemplate($title, $content, $icon = 'icon-screen-desktop') {
             <span class="menu-title">Admins</span>
           </a>
         </li>
+
+        <li class="nav-item nav-back">
+            <a href="/projek-imk/index.php" class="btn btn-outline-light" title="Back to Main Site">
+                <i class="icon-home"></i> Main Site
+            </a>
+        </li>
       </ul>
     </nav>
     
